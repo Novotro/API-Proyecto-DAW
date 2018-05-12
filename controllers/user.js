@@ -187,7 +187,6 @@ function getUsers(req,res){
 }
 
 async function followUserIds(user_id){
-
   try {
       var following = await Follow.find({'user':user_id}).select({'_id':0,'__v':0,'user':0}).exec()
           .then((following) => {
@@ -204,7 +203,7 @@ async function followUserIds(user_id){
               return handleerror(err);
           });
 
-                  
+
       return {
           following: following,
           followed: followed
@@ -240,6 +239,45 @@ async function followUserIds(user_id){
     //   followed: followed_clean
     // }
 
+}
+
+//Contadores de seguidos y gente que nos sigue
+
+function getCounters(req,res){
+  var userId = req.user.sub;
+  if(req.params.id){
+    userId = req.params.id;
+  }
+    getCountFollow(userId).then((value)=>{
+      return res.status(200).send(value);
+    });
+
+}
+
+async function getCountFollow(user_id){
+try{
+    var following = await Follow.count({"user":user_id}).exec().then(count=>{
+        return count;
+    })
+.catch((err)=>{
+        return handleError(err);
+});
+
+    var followed = await Follow.count({"followed":user_id}).exec().then(count=>{
+        return count;
+    })
+    .catch((err)=>{
+        return handleError(err);
+    });
+
+    return {
+        following:following,
+        followed:followed
+    }
+
+    }catch(e){
+    console.log(e);
+    }
 }
 
 
@@ -345,7 +383,9 @@ module.exports = {
   loginUser,
   getUser,
   getUsers,
+  getCounters,
   updateUser,
   uploadImage,
-  getImageFile
+  getImageFile,
+
 }
