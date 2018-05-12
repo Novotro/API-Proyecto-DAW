@@ -66,6 +66,18 @@ function getPublications(req,res){
       });
     });
   });
+}
+
+//Obtener una publicacion segun su id
+function getPublication(req,res){
+  var publicationId = req.params.id;
+  Publication.findById(publicationId,(err,publication)=>{
+    if(err) return res.status(500).send({message: 'Error al devolver promublicaciones'});
+
+    if(!publication) return res.status(404).send({message: 'No existe la publicacion'});
+
+    res.status(200).send({publication});
+  });
 
 }
 
@@ -73,5 +85,6 @@ function getPublications(req,res){
 module.exports={
   probando,
   savePublication,
-  getPublications
+  getPublications,
+  getPublication
 }
