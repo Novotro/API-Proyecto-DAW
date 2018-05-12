@@ -9,6 +9,7 @@ var app = express();
 //Cargar Rutas
 var user_routes = require('./routes/user');
 var follow_routes = require('./routes/follow');
+var publication_routes = require('./routes/publication');
 
 
 //MidleWares (Metodo que se ejecuta antes de que llegue a un controladro)
@@ -19,6 +20,7 @@ app.use(bodyParser.json());
 //Rutas
 app.use('/api', user_routes);
 app.use('/api', follow_routes);
+app.use('/api',publication_routes);
 
 //Exportar Configuracion
 module.exports = app;
