@@ -134,7 +134,6 @@ async function followThisUser(identity_user_id, user_id){
     try {
         var following = await Follow.findOne({ user: identity_user_id, followed: user_id}).exec()
             .then((following) => {
-                console.log(following);
                 return following;
             })
             .catch((err)=>{
@@ -142,7 +141,6 @@ async function followThisUser(identity_user_id, user_id){
             });
         var followed = await Follow.findOne({ user: user_id, followed: identity_user_id}).exec()
             .then((followed) => {
-                console.log(followed);
                 return followed;
             })
             .catch((err)=>{
@@ -176,13 +174,78 @@ function getUsers(req,res){
 
       if(!users) return res.status(404).send({message: 'No hay usuarios disponibles'});
 
-      return res.status(200).send({
+      followUserIds(identity_user_id).then((value)=>{
+        return res.status(200).send({
         users,
+        users_following: value.following,
+        users_follow_me: value.followed,
         total,
         pages: Math.ceil(total / itemsPerPage)
       });
+    });
   });
 }
+
+async function followUserIds(user_id){
+
+  try {
+      var following = await Follow.find({'user':user_id}).select({'_id':0,'__v':0,'user':0}).exec()
+          .then((following) => {
+              return follows;
+          })
+          .catch((err)=>{
+              return handleerror(err);
+          });
+      var followed = await Follow.find({'followed':user_id}).select({'_id':0,'__v':0,'followed':0}).exec()
+          .then((followed) => {
+              return follows;
+          })
+          .catch((err)=>{
+              return handleerror(err);
+          });
+
+                  
+      return {
+          following: following,
+          followed: followed
+      }
+  } catch(e){
+      console.log(e);
+  }
+    //
+    // var following = await Follow.find({'user':user_id}).select({'_id':0,'__v':0,'user':0}).exec((err,follows)=>{
+    //   return follows;
+    // });
+    //
+    // var followed = await Follow.find({'followed':user_id}).select({'_id':0,'__v':0,'followed':0}).exec((err,follows)=>{
+    //   return follows;
+    // });
+    //
+    // //Procesr following ids
+    // var following_clean = [];
+    // following.forEach((follow)=>{
+    //   following_clean.push(follow.followed);
+    // });
+    //
+    //
+    // //Procesar followed ids
+    // var followed_clean = [];
+    // followed.forEach((follow)=>{
+    //   followed_clean.push(follow.followed);
+    // });
+    //
+    //
+    // return{
+    //   following: following_clean,
+    //   followed: followed_clean
+    // }
+
+}
+
+
+
+
+
 
 //Edicion de datos de usuarios
 function updateUser(req, res){
