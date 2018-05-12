@@ -3,6 +3,7 @@
 // var path = require('path');
 // var fs= require('fs');
 var mongoosePaginate = require('mongoose-pagination');
+var mongoose = require('mongoose');
 
 var User = require('../models/user');
 var Follow = require('../models/follow');
@@ -71,7 +72,7 @@ function getFollowingUsers(req,res){
 
 
 
-function getFollowedUsers(req, res){
+function getFollowedUsers(req,res){
   var userId = req.user.sub;
 
   if(req.params.id && req.params.page){
@@ -85,10 +86,13 @@ function getFollowedUsers(req, res){
   }else{
     page = req.params.id;
   }
+  console.log(userId);
 
   var itemsPerPage = 4;
 
-  Follow.find({followed:userId}).populate({path: 'followed'}).paginate(page, itemsPerPage, (err,follows, total) =>{
+
+  Follow.findOne({followed:userId}).populate('user').paginate(page, itemsPerPage, (err,follows, total) =>{
+    console.log(err);
       if(err) return res.status(500).send({message: 'Error en el servidor'});
 
       if(!follows) return res.status(404).send({message: 'No te sigue ningun usuario'});
@@ -99,8 +103,6 @@ function getFollowedUsers(req, res){
           follows
        });
   });
-
-
 
 }
 
