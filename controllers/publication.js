@@ -54,7 +54,7 @@ function getPublications(req,res){
 
     //Busca todos los usuarios que esten dentro de follows clean
     Publication.find({user: {$in: follows_clean}}).sort('-created_at').populate('user').paginate(page,itemsPerPage, (err,publications,total)=>{
-      if(err) return res.status(500).send({message: 'Error al devolver promublicaciones'});
+      if(err) return res.status(500).send({message: 'Error al devolver publicaciones'});
 
       if(!publications) return res.status(404).send({message: 'No hay publicaciones'});
 
@@ -72,11 +72,22 @@ function getPublications(req,res){
 function getPublication(req,res){
   var publicationId = req.params.id;
   Publication.findById(publicationId,(err,publication)=>{
-    if(err) return res.status(500).send({message: 'Error al devolver promublicaciones'});
+    if(err) return res.status(500).send({message: 'Error al devolver publicaciones'});
 
     if(!publication) return res.status(404).send({message: 'No existe la publicacion'});
 
     res.status(200).send({publication});
+  });
+
+}
+//Borrar una publicacion
+function deletePublication(req,res){
+  var publicationId = req.params.id;
+
+  Publication.find({'user': req.user.sub, '_id': publicationId}).remove((err)=>{
+    if(err) return res.status(500).send({message: 'Error al borrar publicacion'});
+
+        res.status(200).send({message: 'Publicacion eliminada correctamente'});
   });
 
 }
@@ -86,5 +97,6 @@ module.exports={
   probando,
   savePublication,
   getPublications,
-  getPublication
+  getPublication,
+  deletePublication
 }
