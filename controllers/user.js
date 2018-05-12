@@ -3,6 +3,7 @@
 var bcrypt = require('bcrypt-nodejs');
 
 var User = require('../models/user');
+var Follow = require('../models/follow');
 
 var jwt = require('../services/jwt');
 
@@ -115,7 +116,10 @@ function getUser(req,res){
 
     if(!user) return res.status(404).send({message: 'El usuario no existe'});
 
-    return res.status(200).send({user});
+    Follow.findOne({"user":req.user.sub, "followed":userId}).exec((err, follow)=>{
+      if(err) return res.status(500).send({message: 'Error al comprobar el seguimiento'});
+      return res.status(200).send({user, follow});
+    });
   });
 }
 
