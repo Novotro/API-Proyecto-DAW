@@ -20,6 +20,7 @@ function saveMessage(req,res){
   message.receiver = params.receiver;
   message.text = params.text;
   message.created_at = moment().unix();
+  message.viewed = 'false';
 
   message.save((err, messageStored) =>{
       if(err)return res.status(500).send({message: 'Error en la peticion'});
@@ -82,9 +83,24 @@ function getEmittMessages(req, res){
     });
 }
 
+//Contar mensajes no leidos
+function getUnviewedMessages(req,res){
+  var userId = req.user.sub;
+
+  Message.count({receiver: userId, viewed:'false'}).exec((err,count)=>{
+    if(err)return res.status(500).send({message: 'Error en la peticion'});
+
+    return res.status(200).send({
+      'unviewed': count
+    });
+  });
+
+}
+
 
 module.exports= {
   saveMessage,
   getReceivedMessages,
-  getEmittMessages
+  getEmittMessages,
+  getUnviewedMessages
 }
