@@ -98,9 +98,25 @@ function getUnviewedMessages(req,res){
 }
 
 
+//Marcar mensajes leidos
+function setViewedMessages(req,res){
+  var userId = req.user.sub;
+//Multi actualiza todos los documentos
+  Message.update({receiver : userId, viewed: 'false'}, {viewed: 'true'}, {'multi':true}, (err, messagesUpdated)=>{
+      if(err)return res.status(500).send({message: 'Error en la peticion'});
+
+      return res.status(200).send({
+        messages: messagesUpdated
+      });
+  });
+}
+
+
+
 module.exports= {
   saveMessage,
   getReceivedMessages,
   getEmittMessages,
-  getUnviewedMessages
+  getUnviewedMessages,
+  setViewedMessages
 }
