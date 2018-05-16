@@ -138,14 +138,14 @@ async function followThisUser(identity_user_id, user_id){
                 return following;
             })
             .catch((err)=>{
-                return handleerror(err);
+                return err;
             });
         var followed = await Follow.findOne({ user: user_id, followed: identity_user_id}).exec()
             .then((followed) => {
                 return followed;
             })
             .catch((err)=>{
-                return handleerror(err);
+                return err;
             });
         return {
             following: following,
@@ -194,14 +194,14 @@ async function followUserIds(user_id){
               return follows;
           })
           .catch((err)=>{
-              return handleerror(err);
+              return err;
           });
       var followed = await Follow.find({'followed':user_id}).select({'_id':0,'__v':0,'followed':0}).exec()
           .then((followed) => {
               return follows;
           })
           .catch((err)=>{
-              return handleerror(err);
+              return err;
           });
 
 
