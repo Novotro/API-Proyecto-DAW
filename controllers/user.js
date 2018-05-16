@@ -212,33 +212,6 @@ async function followUserIds(user_id){
   } catch(e){
       console.log(e);
   }
-    //
-    // var following = await Follow.find({'user':user_id}).select({'_id':0,'__v':0,'user':0}).exec((err,follows)=>{
-    //   return follows;
-    // });
-    //
-    // var followed = await Follow.find({'followed':user_id}).select({'_id':0,'__v':0,'followed':0}).exec((err,follows)=>{
-    //   return follows;
-    // });
-    //
-    // //Procesr following ids
-    // var following_clean = [];
-    // following.forEach((follow)=>{
-    //   following_clean.push(follow.followed);
-    // });
-    //
-    //
-    // //Procesar followed ids
-    // var followed_clean = [];
-    // followed.forEach((follow)=>{
-    //   followed_clean.push(follow.followed);
-    // });
-    //
-    //
-    // return{
-    //   following: following_clean,
-    //   followed: followed_clean
-    // }
 
 }
 
@@ -306,14 +279,27 @@ function updateUser(req, res){
     return res.status(500).send({message: 'No tienes permiso para actualizar los datos del usuario'});
   }
 
-  User.findByIdAndUpdate(userId, update, {new:true},(err,userUpdated) =>{ //con true devuelve el usuario actualizado despues de actualizarlo
-    if(err) return res.status(500).send({message: 'Error en la peticion'});
+  User.find({ $or: [
+    {email: update.email.toLowerCase()},
+    {nick: update.nick.toLowerCase()}
+    ]}).exec((err, users) =>{
+        var user_isset = false;
+        users.forEach((user)=>{
+            if(user && user._id != userId) user_isset = true;
+        });
+        if(user_isset) return res.status(404).send({message: 'Los datos ya están en uso'});
 
-    if(!userUpdated) return res.status(404).send({message: 'No se ha podido actualizar el usuario'});
+        User.findByIdAndUpdate(userId, update, {new:true},(err,userUpdated) =>{ //con true devuelve el usuario actualizado despues de actualizarlo
+          if(err) return res.status(500).send({message: 'Error en la peticion'});
 
-    return res.status(200).send({user: userUpdated});//Devuelve el usuario actualizado
+          if(!userUpdated) return res.status(404).send({message: 'No se ha podido actualizar el usuario'});
 
-  });
+          return res.status(200).send({user: userUpdated});//Devuelve el usuario actualizado
+
+        });
+    });
+
+
 }
 
 
