@@ -51,6 +51,8 @@ function getPublications(req,res){
     follows.forEach((follow)=>{
       follows_clean.push(follow.followed);
     });
+    follows_clean.push(req.user.sub);
+
 
     //Busca todos los usuarios que esten dentro de follows clean
     Publication.find({user: {$in: follows_clean}}).sort('-created_at').populate('user').paginate(page,itemsPerPage, (err,publications,total)=>{
