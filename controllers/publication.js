@@ -124,7 +124,54 @@ function deletePublication(req,res){
 }
 
 //Subir ficheros a publicaciones
+function uploadImage(req,res){
+    var publicationId = req.params.id;
+    //En la request se envian los ficheros
+    if(req.files){
+        //nombre del archivos
+        var file_path = req.files.image.path;
+        var file_split = file_path.split('/'); // Al estar en linux hay que poner solo una /, en windows seria \\
+        var file_name = file_split[2];
 
+        //Guardo extension del fichero
+        var ext_split = file_name.split('\.');
+        var file_ext = ext_split[1];
+
+
+        if(file_ext == 'png' || file_ext == 'jpg' || file_ext == 'jpeg' || file_ext == 'gif'){
+            //Actualizar imagen de la publicacion
+            Publication.findByIdAndUpdate(publicationId, {file: file_name}, {new:true}, (err,publicationUpdated) =>{
+                if(err) return res.status(500).send({message: 'Error en la peticion'});
+
+                if(!publicationUpdated) return res.status(404).send({message: 'No se ha podido actualizar el usuario'});
+
+                return res.status(200).send({publication: publicationUpdated});//Devuelve el usuario actualizado
+
+            });
+        }else{
+            //Elimina el archivo si no tiene la extension correcta
+            return removeFilesOfUploads(res, file_path, 'Extension no valida');
+        }
+
+    }else{
+        return res.status(200).send({message: 'No se han subido imagenes'});
+    }
+
+}
+
+function getImageFile(req,res){
+    var image_file = req.params.imageFile;//Va por la Url
+    var path_file = './uploads/publications/'+image_file;
+
+    fs.exists(path_file, (exists)=>{
+        if(exists){
+            res.sendFile(path.resolve(path_file));
+        }else{
+            return res.status(200).send({message: 'No existe la imagen...'});
+        }
+    });
+
+}
 
 
 
@@ -134,5 +181,7 @@ module.exports={
   getPublications,
   getPublication,
   deletePublication,
-  getPublicationsUser
+  getPublicationsUser,
+  uploadImage,
+  getImageFile
 }
