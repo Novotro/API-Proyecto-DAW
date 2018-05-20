@@ -61,10 +61,14 @@ function getFollowingUsers(req,res){
 
       if(!follows) return res.status(404).send({message: 'No estas siguiendo a ningun usuario'});
 
-      return  res.status(200).send({
-          total: total,
-          pages: Math.ceil(total/itemsPerPage),
-          follows
+      followUserIds(req.user.sub).then((value)=>{
+          return  res.status(200).send({
+              total: total,
+              pages: Math.ceil(total/itemsPerPage),
+              follows,
+              users_following: value.following,
+              users_follow_me: value.followed
+           });
        });
   });
 
@@ -97,11 +101,13 @@ function getFollowedUsers(req,res){
 
       if(!follows) return res.status(404).send({message: 'No te sigue ningun usuario'});
 
-      return  res.status(200).send({
-          total: total,
-          pages: Math.ceil(total/itemsPerPage),
-          follows
-       });
+          return  res.status(200).send({
+              total: total,
+              pages: Math.ceil(total/itemsPerPage),
+              follows,
+              users_following: value.following,
+              users_follow_me: value.followed
+           });
   });
 
 }
@@ -127,6 +133,47 @@ function getMyFollows(req,res){
 
 
 
+async function followUserIds(user_id){
+    try {
+        var following = await Follow.find({'user':user_id}).select({'_id':0,'__v':0,'user':0}).exec()
+        .then((following) => {
+            return following;
+        })
+        .catch((err)=>{
+            return handleError(err);
+        });
+        var followed = await Follow.find({'followed':user_id}).select({'_id':0,'__v':0,'followed':0}).exec()
+        .then((followed) => {
+            return followed;
+        })
+        .catch((err)=>{
+            return handleError(err);
+        });    //Procesr following ids
+        var following_clean = [];
+        following.forEach((follow)=>{
+            following_clean.push(follow.followed);
+        });
+
+
+        //Procesar followed ids
+        var followed_clean = [];
+        followed.forEach((follow)=>{
+            followed_clean.push(follow.user);
+        });
+
+        return{
+            following: following_clean,
+            followed: followed_clean
+        }
+        return {
+            following: following,
+            followed: followed
+        }
+    } catch(e){
+        console.log(e);
+    }
+}
+
 
 
 
@@ -138,5 +185,6 @@ module.exports={
   deleteFollow,
   getFollowingUsers,
   getFollowedUsers,
-  getMyFollows
+  getMyFollows,
+  followUserIds
 }
