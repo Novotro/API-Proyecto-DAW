@@ -377,19 +377,19 @@ function getImageFile(req,res){
             return res.status(200).send({message: 'No existe la imagen...'});
         }
     });
-
 }
 
 //Borrar usuario
-// function deleteAccount(){
-//     var userId= req.params.id;
-//         User.findByIdAndRemove(userId,(err) =>{
-//             if(err) return res.status(500).send({message: 'Error al borrar al usuario'});
-//
-//             return res.status(200).send({message: 'Usuario Borrado'});
-//         });
-// }
-//
+function deleteAccount(req,res){
+    var userId= req.params.id;
+        User.findByIdAndRemove(userId,(err) =>{
+            console.log(userId);
+            if(err) return res.status(500).send({message: 'Error al borrar al usuario'});
+
+            return res.status(200).send({message: 'Usuario Borrado'});
+        });
+}
+
 
 
 
@@ -418,4 +418,5 @@ module.exports = {
     updateUser,
     uploadImage,
     getImageFile,
+    deleteAccount
 }
