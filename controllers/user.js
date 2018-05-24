@@ -162,29 +162,39 @@ async function followThisUser(identity_user_id, user_id){
 //Devolver un listado de usuarios painado
 function getUsers(req,res){
     var identity_user_id = req.user.sub; //Aqui esta el id del usuario logeado por jwt.js
-
+    var paginar = req.params.paginar;
     var page = 1;
     if(req.params.page){
         page = req.params.page;
     }
 
     var itemsPerPage = 5; // items por pagination
+    if(paginar){
+        User.find().sort('_id').paginate(page, itemsPerPage, (err, users, total) =>{
+            if(err) return res.status(500).send({message: 'Error en la peticion'});
 
-    User.find().sort('_id').paginate(page, itemsPerPage, (err, users, total) =>{
-        if(err) return res.status(500).send({message: 'Error en la peticion'});
+            if(!users) return res.status(404).send({message: 'No hay usuarios disponibles'});
 
-        if(!users) return res.status(404).send({message: 'No hay usuarios disponibles'});
-
-        followUserIds(identity_user_id).then((value)=>{
-            return res.status(200).send({
-                users,
-                users_following: value.following,
-                users_follow_me: value.followed,
-                total,
-                pages: Math.ceil(total / itemsPerPage)
+            followUserIds(identity_user_id).then((value)=>{
+                return res.status(200).send({
+                    users,
+                    users_following: value.following,
+                    users_follow_me: value.followed,
+                    total,
+                    pages: Math.ceil(total / itemsPerPage)
+                });
             });
         });
-    });
+
+    }else{
+        User.find().sort('_id').exec((err, users) =>{
+            if(err) return res.status(500).send({message: 'Error en la peticion'});
+            if(!users) return res.status(404).send({message: 'No hay usuarios disponibles'});
+            return res.status(200).send({users});
+        });
+
+    }
+
 }
 
 async function followUserIds(user_id){
@@ -370,6 +380,18 @@ function getImageFile(req,res){
 
 }
 
+//Borrar usuario
+// function deleteAccount(){
+//     var userId= req.params.id;
+//         User.findByIdAndRemove(userId,(err) =>{
+//             if(err) return res.status(500).send({message: 'Error al borrar al usuario'});
+//
+//             return res.status(200).send({message: 'Usuario Borrado'});
+//         });
+// }
+//
+
+
 
 
 
@@ -396,5 +418,4 @@ module.exports = {
     updateUser,
     uploadImage,
     getImageFile,
-
 }
