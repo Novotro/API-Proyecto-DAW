@@ -18,36 +18,37 @@ var path = require('path');
 function saveTravel(req,res){
     var params = req.body; //Es recomendable hacer una variable para los parametros que llegan desde request
     var travel = new Travel();
-    /*name: String,
-    country: String,
-    organizer: {type: Schema.ObjectId, ref: 'User'},
-    date: String,
-    state: String,
-    description: String,
-    activities: String,
-    galery: [String]*/
+    // public  name: String,
+    // public  country: String,
+    // public  organizer: String,
+    // public  date: String,
+    // public  status: Boolean,
+    // public  description: String,
+    // public  galery: [String],
+    // public  markers: Array<any>
     //Si llegan todos estos campos...
     if(params.name && params.country && params.date && params.description && params.organizer){
 
         travel.name = params.name;
         travel.country = params.country;
-        travel.date= params.date;
         travel.organizer=params.organizer;
-        travel.state = true;
+        travel.date= params.date;
+        travel.status = true;
         travel.description = params.description;
-        travel.activities = "";
         travel.galery = null;
+        travel.markers =  params.markers;
 
 
         travel.save((err, travelStored) =>{
             if(err) return res.status(500).send({message: 'Error al guardar el viaje'});
-            //Si el usuario se guarda
+            //Si el viaje se guarda
             if(travelStored){
                 res.status(200).send({travel: travelStored});
             }else{
+                console.log("errooooooor");
                 res.status(404).send({message: 'No se ha registrado el viaje'});
             }
-        });   
+        });
 
     }else{
         res.status(200).send({message: 'Envia todos los campos necesarios!!'});
@@ -162,7 +163,7 @@ function updateTravel(req, res){
     const mongoose = require('mongoose');
     //console.log(mongoose.Types.ObjectId.isValid(travelId));
 
-    //console.log(travelId);  
+    //console.log(travelId);
     Travel.findByIdAndUpdate(travelId, update, {new:true},(err,travelUpdated) =>{ //con true devuelve el usuario actualizado despues de actualizarlo
         if(err) return res.status(500).send({message: 'Error en la peticion ', err});
 

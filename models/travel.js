@@ -8,11 +8,14 @@ var TravelSchema = Schema({
   country: String,
   organizer: {type: Schema.ObjectId, ref: 'User'},
   date: String,
-  state: Boolean,
+  status: Boolean,
   description: String,
-  activities: String,
-  galery: [String]
-  
+  galery: [String],
+  markers: []
+
 });
+
+
+
 
 module.exports = mongoose.model('Travel', TravelSchema);
