@@ -119,7 +119,7 @@ function getTravels(req,res){
     }
 
     var itemsPerPage = 5; // items por pagination
-    if(paginar){
+    if(paginar=="true"){
         Travel.find().sort('_id').paginate(page, itemsPerPage, (err, travels, total) =>{
             if(err) return res.status(500).send({message: 'Error en la peticion'});
 
@@ -142,6 +142,8 @@ function getTravels(req,res){
         });
 
     }
+
+    
 
 }
 
