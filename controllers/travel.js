@@ -112,34 +112,37 @@ async function followThisTravel(identity_user_id, user_id){
 //Devolver un listado de viajes paginado
 function getTravels(req,res){
     //var identity_travel_id = req.travel.sub; //Aqui esta el id del usuario logeado por jwt.js
-
+    var paginar = req.params.paginar;
     var page = 1;
     if(req.params.page){
         page = req.params.page;
     }
 
     var itemsPerPage = 5; // items por pagination
+    if(paginar){
+        Travel.find().sort('_id').paginate(page, itemsPerPage, (err, travels, total) =>{
+            if(err) return res.status(500).send({message: 'Error en la peticion'});
 
-    Travel.find().sort('_id').paginate(page, itemsPerPage, (err, travels, total) =>{
-        if(err) return res.status(500).send({message: 'Error en la peticion'});
+            if(!travels) return res.status(404).send({message: 'No hay viajes disponibles'});
 
-        if(!travels) return res.status(404).send({message: 'No hay viajes disponibles'});
-
-        /*followUserIds(identity_travel_id).then((value)=>{
-            return res.status(200).send({
+            return   res.status(200).send({
                 travels,
-                travels_following: value.following,
-                travels_follow_me: value.followed,
                 total,
                 pages: Math.ceil(total / itemsPerPage)
             });
-        });*/
-        return   res.status(200).send({
-            travels,
-            total,
-            pages: Math.ceil(total / itemsPerPage)
         });
-    });
+
+    }else{
+        Travel.find().sort('_id').exec((err, travels) =>{
+            if(err) return res.status(500).send({message: 'Error en la peticion'});
+
+            if(!travels) return res.status(404).send({message: 'No hay viajes disponibles'});
+
+            return  res.status(200).send({travels});
+        });
+
+    }
+
 }
 
 
