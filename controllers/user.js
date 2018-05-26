@@ -162,14 +162,22 @@ async function followThisUser(identity_user_id, user_id){
 //Devolver un listado de usuarios painado
 function getUsers(req,res){
     var identity_user_id = req.user.sub; //Aqui esta el id del usuario logeado por jwt.js
-    var paginar = req.params.paginar;
     var page = 1;
     if(req.params.page){
         page = req.params.page;
     }
 
     var itemsPerPage = 5; // items por pagination
-    if(paginar){
+    if(page=='false'){
+        User.find().sort('_id').exec((err, users) =>{
+            if(err) return res.status(500).send({message: 'Error en la peticion'});
+            if(!users) return res.status(404).send({message: 'No hay usuarios disponibles'});
+            return res.status(200).send({users});
+        });
+
+
+    }else{
+
         User.find().sort('_id').paginate(page, itemsPerPage, (err, users, total) =>{
             if(err) return res.status(500).send({message: 'Error en la peticion'});
 
@@ -184,13 +192,6 @@ function getUsers(req,res){
                     pages: Math.ceil(total / itemsPerPage)
                 });
             });
-        });
-
-    }else{
-        User.find().sort('_id').exec((err, users) =>{
-            if(err) return res.status(500).send({message: 'Error en la peticion'});
-            if(!users) return res.status(404).send({message: 'No hay usuarios disponibles'});
-            return res.status(200).send({users});
         });
 
     }

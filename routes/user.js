@@ -15,7 +15,6 @@ api.post('/register', UserController.saveUser);
 api.post('/login', UserController.loginUser);
 api.get('/user/:id', md_auth.ensureAuth, UserController.getUser);
 api.get('/users/:page?', md_auth.ensureAuth, UserController.getUsers);//numero de pagina opcional
-api.get('/users/:paginar?', md_auth.ensureAuth, UserController.getUsers);//numero de pagina opcional
 api.put('/update-user/:id', md_auth.ensureAuth, UserController.updateUser);
 api.delete('/delete-user/:id', md_auth.ensureAuth, UserController.deleteAccount);
 api.post('/upload-image-user/:id', [md_auth.ensureAuth, md_upload], UserController.uploadImage);
