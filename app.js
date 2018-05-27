@@ -12,6 +12,7 @@ var follow_routes = require('./routes/follow');
 var publication_routes = require('./routes/publication');
 var message_routes = require('./routes/message');
 var travel_routes = require('./routes/travel');
+var enroll_routes= require('./routes/enroll');
 
 
 //MidleWares (Metodo que se ejecuta antes de que llegue a un controlador)
@@ -33,6 +34,7 @@ app.use('/api', follow_routes);
 app.use('/api',publication_routes);
 app.use('/api',message_routes);
 app.use('/api',travel_routes);
+app.use('/api',enroll_routes);
 
 //Exportar Configuracion
 module.exports = app;

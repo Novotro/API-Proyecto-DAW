@@ -148,7 +148,16 @@ function getTravels(req,res){
 }
 
 
+//Borrar usuario
+function deleteTravel(req,res){
+    var travelId= req.params.id;
+        Travel.findByIdAndRemove(travelId,(err) =>{
+            console.log(travelId);
+            if(err) return res.status(500).send({message: 'Error al borrar al viaje'});
 
+            return res.status(200).send({message: 'Viaje Borrado'});
+        });
+}
 
 
 

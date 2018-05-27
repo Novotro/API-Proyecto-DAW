@@ -14,6 +14,8 @@ api.get('/travelById/:id',  TravelController.getTravelById);
 api.put('/update-travel/:id',  TravelController.updateTravel);
 api.get('/travelsList/:paginar?', TravelController.getTravels);
 
+api.delete('/delete-travel/:id', md_auth.ensureAuth, TravelController.deleteTravel);
+
 
 
 
