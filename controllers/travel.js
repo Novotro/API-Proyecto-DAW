@@ -27,6 +27,7 @@ function saveTravel(req,res){
     // public  galery: [String],
     // public  markers: Array<any>
     //Si llegan todos estos campos...
+    console.log(params);
     if(params.name && params.country && params.date && params.description && params.organizer){
 
         travel.name = params.name;
@@ -196,6 +197,7 @@ module.exports = {
     saveTravel,
     updateTravel,
     getTravelById,
-    getTravels
+    getTravels,
+    deleteTravel
 
 }
