@@ -9,12 +9,15 @@ var md_auth = require('../middlewares/authenticated');
 var multipart = require('connect-multiparty');
 var md_upload = multipart({uploadDir: './uploads/travels'});
 
+
 api.post('/addTravel', TravelController.saveTravel);
 api.get('/travelById/:id',  TravelController.getTravelById);
 api.put('/update-travel/:id',  TravelController.updateTravel);
 api.get('/travelsList/:paginar?', TravelController.getTravels);
+api.delete('/delete-travel/:id', TravelController.deleteTravel);
+api.post('/upload-image-travel/:id',  md_upload, TravelController.uploadImage);
+api.get('/get-image-travel/:imageFile', TravelController.getImageFile);
 
-api.delete('/delete-travel/:id', md_auth.ensureAuth, TravelController.deleteTravel);
 
 
 

@@ -27,7 +27,6 @@ app.use((req, res, next) => {
 
     next();
 });
-
 //Rutas
 app.use('/api', user_routes);
 app.use('/api', follow_routes);

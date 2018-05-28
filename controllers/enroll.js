@@ -27,13 +27,14 @@ function saveEnroll(req,res){
 }
 
 function deleteEnroll(req,res){
-  var userId = req.user.sub;
+  var user= req.user.sub;
   var enrollId = req.params.id;
+  console.log(req);
+  
+  Enroll.find({'user':user, 'enrolled':enrollId}).remove(err =>{
+    if(err) return res.status(500).send({message: 'Error al dejar de estar'});
 
-  Enroll.find({'user': userId, 'enroll':enrollId}).remove(err =>{
-    if(err) return res.status(500).send({message: 'Error al dejar de seguir'});
-
-    return res.status(200).send({message: ' El usuario ya no está apuntado.'});
+    return res.status(200).send({message: 'Ya no hay enroll.'});
   });
 
 }
@@ -68,15 +69,12 @@ function getEnrolledUsers(req,res){
           return  res.status(200).send({
               total: total,
               pages: Math.ceil(total/itemsPerPage),
-              enrolls,
-              users_follow_me: value.enrolled
+              enrolls
            });
        });
   });
 
 }
-
-
 
 
   //Devolver listado de usuarios
@@ -136,7 +134,7 @@ async function enrollUserIds(user_id){
 
 
 module.exports={
-  saveEnroll,
+    saveEnroll,
   deleteEnroll,
   getEnrolledUsers,
   //getMyEnrolls,

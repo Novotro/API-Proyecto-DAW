@@ -331,6 +331,7 @@ function updateUser(req, res){
 function uploadImage(req,res){
     var userId= req.params.id;
     //En la request se envian los ficheros
+    console.log("a");
     if(req.files){
         //nombre del archivos
         var file_path = req.files.image.path;

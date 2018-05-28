@@ -18,15 +18,7 @@ var path = require('path');
 function saveTravel(req,res){
     var params = req.body; //Es recomendable hacer una variable para los parametros que llegan desde request
     var travel = new Travel();
-    // public  name: String,
-    // public  country: String,
-    // public  organizer: String,
-    // public  date: String,
-    // public  status: Boolean,
-    // public  description: String,
-    // public  galery: [String],
-    // public  markers: Array<any>
-    //Si llegan todos estos campos...
+
     console.log(params);
     if(params.name && params.country && params.date && params.description && params.organizer){
 
@@ -36,7 +28,7 @@ function saveTravel(req,res){
         travel.date= params.date;
         travel.status = true;
         travel.description = params.description;
-        travel.galery = null;
+        travel.galery = [];
         travel.markers =  params.markers;
 
 
@@ -161,6 +153,64 @@ function deleteTravel(req,res){
 }
 
 
+//Subir archivos de imagen/avatar de usuarios
+function uploadImage(req,res){
+    var travelId= req.params.id;
+    //En la request se envian los ficheros
+    if(req.files){
+        //nombre del archivos
+        console.log("-----------------");
+
+        var file_path = req.files.image.path;
+        var file_split = file_path.split('/'); // Al estar en linux hay que poner solo una /, en windows seria \\
+        var file_name = file_split[2];
+
+        //Guardo extension del fichero
+        var ext_split = file_name.split('\.');
+        var file_ext = ext_split[1];
+
+        if(file_ext == 'png' || file_ext == 'jpg' || file_ext == 'jpeg' || file_ext == 'gif'){
+            //Actualizar imagen del usuario logeado
+
+            Travel.findById(travelId, (err,travel) => {
+                if(err) return res.status(500).send({message: 'Error en la peticion'});
+        
+                if(!travel) return res.status(404).send({message: 'El viaje no existe'});
+                travel.galery.push( file_name)
+                Travel.findByIdAndUpdate(travelId, travel, {new:true},(err,travelUpdated) =>{ //con true devuelve el usuario actualizado despues de actualizarlo
+                    if(err) return res.status(500).send({message: 'Error en la peticion'});
+        
+                    if(!travelUpdated) return res.status(404).send({message: 'No se ha podido actualizar la galeria'});
+        
+                    return res.status(200).send({travel: travelUpdated});//Devuelve el usuario actualizado
+        
+                });
+        
+            });
+        }else{
+            //Elimina el archivo si no tiene la extension correcta
+            return removeFilesOfUploads(res, file_path, 'Extension no valida');
+        }
+
+    }else{
+        return res.status(200).send({message: 'No se han subido imagenes'});
+    }
+
+}
+
+function getImageFile(req,res){
+    var image_file = req.params.imageFile;//Va por la Url
+    var path_file = './uploads/travels/'+image_file;
+
+    fs.exists(path_file, (exists)=>{
+        if(exists){
+            res.sendFile(path.resolve(path_file));
+        }else{
+            return res.status(200).send({message: 'No existe la imagen...'});
+        }
+    });
+}
+
 
 
 
@@ -198,6 +248,8 @@ module.exports = {
     updateTravel,
     getTravelById,
     getTravels,
-    deleteTravel
+    deleteTravel,
+    uploadImage,
+    getImageFile
 
 }
