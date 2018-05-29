@@ -10,20 +10,35 @@ var Enroll = require('../models/enroll');
 
 function saveEnroll(req,res){
   var params = req.body;
-  console.log("alo");
   var enroll= new Enroll();
-  enroll.user = req.user.sub;
-  enroll.enrolled = params.enrolled;
+  var userId = req.user.sub;
+  var enrollId = params.enrolled;
+  console.log(enrollId);
+ //-------------------------------
+   //Controlar usuarios duplicados
+   Enroll.find({'user': userId, 'enrolled':enrollId}).exec((err,enrollF) => {
+      if(err) return res.status(500).send({message: 'Error en la peticin del follow'});
 
-  enroll.save((err, enrollStored)=>{
-    if(err) return res.status(500).send({message: 'Error al guardar el seguimiento'});
-
-    if(!enrollStored){
-      return res.status(404).send({message: 'El seguimiento no se ha guardado'});
-    }
-    //Si no hay errores se envia el seguimiento
-    return res.status(200).send({enroll: enrollStored});
+      if(enrollF && enrollF.length>=1){
+          return res.status(200).send({message: 'Ya existe este enroll'});
+      }else{
+          enroll.user= userId;
+          enroll.enrolled = enrollId;
+          enroll.save((err, enrollStored)=>{
+          if(err) return res.status(500).send({message: 'Error al guardar el seguimiento'});
+      
+          if(!enrollStored){
+            return res.status(404).send({message: 'El seguimiento no se ha guardado'});
+          }
+          //Si no hay errores se envia el seguimiento
+          return res.status(200).send({enroll: enrollStored});
+        }); 
+      }
   });
+
+ //---------------------------
+
+  
 }
 
 function deleteEnroll(req,res){
