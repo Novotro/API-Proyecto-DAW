@@ -11,6 +11,7 @@ api.get('/my-messages/:page?', md_auth.ensureAuth, MessageController.getReceived
 api.get('/messages/:page?', md_auth.ensureAuth, MessageController.getEmittMessages);
 api.get('/unviewed-messages', md_auth.ensureAuth, MessageController.getUnviewedMessages);
 api.get('/set-viewed-messages', md_auth.ensureAuth, MessageController.setViewedMessages);
+api.delete('/delete-message/:id', MessageController.deleteMessage);
 
 
 

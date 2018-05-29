@@ -111,7 +111,15 @@ function setViewedMessages(req,res){
       });
   });
 }
+function deleteMessage(req,res){
+    var messageId = req.params.id;
 
+    Message.findByIdAndRemove(messageId,(err) =>{
+        if(err) return res.status(500).send({message: 'Error al borrar el mensaje'});
+
+        return res.status(200).send({message: 'Mensaje Borrado'});
+    });
+}
 
 
 module.exports= {
@@ -119,5 +127,6 @@ module.exports= {
   getReceivedMessages,
   getEmittMessages,
   getUnviewedMessages,
-  setViewedMessages
+  setViewedMessages,
+  deleteMessage
 }
