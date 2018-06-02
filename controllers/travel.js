@@ -1,6 +1,7 @@
 'use strict'
 //Encriptador de contraseñas
 var bcrypt = require('bcrypt-nodejs');
+var Enroll = require('../models/enroll');
 
 var Travel = require('../models/travel');
 var Follow = require('../models/follow');
@@ -241,6 +242,64 @@ function updateTravel(req, res){
 
 }
 
+async function followUserIds(travel_id){
+    try {
+        //var enrolling = await Enroll.find({'user':travel_id}).select({'_id':0}).exec()
+        //.then((enrolling) => {
+        //    return enrolling;
+        //})
+        //.catch((err)=>{
+        //    return handleError(err);
+        //});
+        var enrolled = await Enroll.find({'enrolled':travel_id}).select({'_id':0}).exec()
+        .then((enrolled) => {
+            //console.log(enrolled);
+            return enrolled;
+        })
+        .catch((err)=>{
+            return handleError(err);
+        });    //Procesr following ids
+       // var enrolling_clean = [];
+        //enrolling.forEach((enroll)=>{
+        //   enrolling_clean.push(enroll.enrolled);
+        //});
+
+
+        //Procesar followed ids
+        var enrolled_clean = [];
+        enrolled.forEach((enroll)=>{
+            enrolled_clean.push(enroll.user);
+        });
+
+        return{
+           // enrolling: enrolling_clean,
+            enrolled: enrolled_clean
+        }
+        return {
+            //enrolling: enrolling,
+            enrolled: enrolled
+        }
+    } catch(e){
+        console.log(e);
+    }
+}
+
+//Devolver un listado de viajes paginado
+function getTravelsFollow(req,res){
+    var travelId= req.params.id;
+    console.log(travelId);
+
+        followUserIds(travelId).then((value)=>{
+            return{
+                travel_id: travelId,
+                users_follow_me: value.enrolled 
+            };
+        });
+
+}
+
+
+
 
 //Hay que exportar las funciones a objetos
 module.exports = {
@@ -250,6 +309,7 @@ module.exports = {
     getTravels,
     deleteTravel,
     uploadImage,
-    getImageFile
+    getImageFile,
+    getTravelsFollow
 
 }
